@@ -7,5 +7,8 @@ class MainMenu:
     def __init__(self, main):
         self.main = main
 
+    def update(self):
+        pass
+
         # self.play_button_image = pygame.image.load(settings.PLAY_BUTTON_PATH).convert_alpha()
         # self.play_button = gui_tools.Button(self.main.screen, settings.PLAY_BUTTON_PATH, (settings.WIDTH, settings.HEIGHT))

@@ -1,7 +1,7 @@
 import pygame
 import random
-# import math
-# import scripts.image_surfaces as image_surfaces
+# from collections import namedtuple
+import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
 
@@ -10,11 +10,10 @@ import scripts.gui_tools as gui_tools
 class Game:
     def __init__(self, main, rows, columns, bombs):
         self.main = main
+        self.images = scripts.images.GameImages('blue')  # initialize images
         self.grid = Grid(self.main, rows, columns, bombs)
 
-        # initialize images and add bomb and num images to cell_dict
-        self.cell_dict = {}
-        self.initialize_images()
+        self.update_window_size()  # change window size relative to current grid size
 
         self.clicked = False  # variable used to don't allow multiple clicks if holding mouse button
 
@@ -27,37 +26,18 @@ class Game:
 
         # DEBUG show text if won or losed
         if self.grid.won:
-            gui_tools.text_renderer(self.main.screen, 'You Won!', 'center', 64, (pygame.display.get_window_size()[0]//2, pygame.display.get_window_size()[1]//2), settings.WHITE)
+            gui_tools.text_renderer(self.main.screen, 'You Won!', 'center', 64, (
+                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2), settings.WHITE)
         if self.grid.lost:
-            gui_tools.text_renderer(self.main.screen, 'You Lost!', 'center', 64, (pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2), settings.WHITE)
+            gui_tools.text_renderer(self.main.screen, 'You Lost!', 'center', 64, (
+                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2), settings.WHITE)
 
-    def initialize_images(self):
-        self.cell_cover_surface = gui_tools.import_image(settings.CELL_COVER_PATH, settings.CELL_SIZE / 128)
-        self.cell_bomb_surface = gui_tools.import_image(settings.CELL_BOMB_PATH, settings.CELL_SIZE / 128)
-        self.cell_exploded_bomb_surface = gui_tools.import_image(settings.CELL_EXPLODED_BOMB_PATH, settings.CELL_SIZE / 128)
-        self.cell_flag_surface = gui_tools.import_image(settings.CELL_FLAG_PATH, settings.CELL_SIZE / 128)
-        self.cell_0_surface = gui_tools.import_image(settings.CELL_0_PATH, settings.CELL_SIZE / 128)
-        self.cell_1_surface = gui_tools.import_image(settings.CELL_1_PATH, settings.CELL_SIZE / 128)
-        self.cell_2_surface = gui_tools.import_image(settings.CELL_2_PATH, settings.CELL_SIZE / 128)
-        self.cell_3_surface = gui_tools.import_image(settings.CELL_3_PATH, settings.CELL_SIZE / 128)
-        self.cell_4_surface = gui_tools.import_image(settings.CELL_4_PATH, settings.CELL_SIZE / 128)
-        self.cell_5_surface = gui_tools.import_image(settings.CELL_5_PATH, settings.CELL_SIZE / 128)
-        self.cell_6_surface = gui_tools.import_image(settings.CELL_6_PATH, settings.CELL_SIZE / 128)
-        self.cell_7_surface = gui_tools.import_image(settings.CELL_7_PATH, settings.CELL_SIZE / 128)
-        self.cell_8_surface = gui_tools.import_image(settings.CELL_8_PATH, settings.CELL_SIZE / 128)
-
-        self.cell_dict = {
-            -1: self.cell_bomb_surface,
-            0: self.cell_0_surface,
-            1: self.cell_1_surface,
-            2: self.cell_2_surface,
-            3: self.cell_3_surface,
-            4: self.cell_4_surface,
-            5: self.cell_5_surface,
-            6: self.cell_6_surface,
-            7: self.cell_7_surface,
-            8: self.cell_8_surface,
-        }
+    def update_window_size(self):
+        # change window size accordingly to cells size
+        self.main.screen = pygame.display.set_mode((
+            (settings.CELL_SIZE * self.grid.columns + settings.LEFT_MARGIN + settings.RIGHT_MARGIN),
+            settings.CELL_SIZE * self.grid.rows + settings.GRID_MARGIN[0] + settings.GRID_MARGIN[2] +
+            settings.HUD_MARGIN[0] + settings.HUD_MARGIN[2] + settings.HUD_SIZE))
 
     # ====== CHECK INPUTS
 
@@ -82,17 +62,10 @@ class Game:
         if pygame.mouse.get_pressed(3)[2] and not self.clicked:
             self.clicked = True
 
-            # mouse position inside the grid
-            grid_mouse_pos = (mouse_pos[0] - settings.GRID_MARGIN[3], mouse_pos[1] - settings.GRID_MARGIN[0])
+            grid_pos = gui_tools.screen_to_grid_pos(mouse_pos, self.grid.rows, self.grid.columns)
+            if grid_pos is not None:
+                clicked_cell = grid_pos
 
-            # return if clicked out of grid
-            if grid_mouse_pos[0] < 0 or grid_mouse_pos[1] < 0 or grid_mouse_pos[
-                0] >= settings.CELL_SIZE * self.grid.columns or grid_mouse_pos[
-                1] >= settings.CELL_SIZE * self.grid.rows:
-                return None
-
-            # calculate cell clicked
-            clicked_cell = (grid_mouse_pos[1] // settings.CELL_SIZE, grid_mouse_pos[0] // settings.CELL_SIZE)
         if not pygame.mouse.get_pressed(3)[0] and not pygame.mouse.get_pressed(3)[2]:  # both mouse buttons
             self.clicked = False
 
@@ -108,15 +81,10 @@ class Game:
         if pygame.mouse.get_pressed(3)[0] and not self.clicked:
             self.clicked = True
 
-            # mouse position inside the grid
-            grid_mouse_pos = (mouse_pos[0] - settings.GRID_MARGIN[3], mouse_pos[1] - settings.GRID_MARGIN[0])
+            grid_pos = gui_tools.screen_to_grid_pos(mouse_pos, self.grid.rows, self.grid.columns)
+            if grid_pos is not None:
+                clicked_cell = grid_pos
 
-            # return if clicked out of grid
-            if grid_mouse_pos[0] < 0 or grid_mouse_pos[1] < 0 or grid_mouse_pos[0] >= settings.CELL_SIZE * self.grid.columns or grid_mouse_pos[1] >= settings.CELL_SIZE * self.grid.rows:
-                return None
-
-            # calculate cell clicked
-            clicked_cell = (grid_mouse_pos[1] // settings.CELL_SIZE, grid_mouse_pos[0] // settings.CELL_SIZE)
         if not pygame.mouse.get_pressed(3)[0] and not pygame.mouse.get_pressed(3)[2]:  # both mouse buttons
             self.clicked = False
 
@@ -124,14 +92,20 @@ class Game:
 
     # ====== INPUT ACTIONS
 
-    def left_click(self, clicked_cell):
+    def left_click(self, clicked_cell_pos):
+        clicked_cell = self.grid.list[clicked_cell_pos[0]][clicked_cell_pos[1]]
+
+        # don't do nothing if the clicked cell is flagged
+        if clicked_cell.flagged:
+            return
+
         # start game if is the first click
         if not self.grid.started:
-            self.grid.start_game(clicked_cell)
+            self.grid.start_game(clicked_cell_pos)
             self.grid.started = True
 
         # if clicked on a bomb TODO transfer this to a function
-        if self.grid.list[clicked_cell[0]][clicked_cell[1]].type == -1:
+        if clicked_cell.type == -1:
             # end game, stop game inputs
             self.grid.block_input = True
             self.grid.lost = True
@@ -143,10 +117,10 @@ class Game:
                         self.grid.list[i][j].reveal()
 
             # change clicked bomb to exploded image
-            self.grid.list[clicked_cell[0]][clicked_cell[1]].exploded = True
+            clicked_cell.exploded = True
 
         # reveal
-        self.grid.list[clicked_cell[0]][clicked_cell[1]].reveal()
+        clicked_cell.reveal()
 
     def right_click(self, clicked_cell):
         i = clicked_cell[0]
@@ -176,10 +150,6 @@ class Grid:
         # create a list with empty cells to be filled later
         self.list = self.create_cell_list(self.rows, self.columns)
 
-        # change window size accordingly to cells size
-        self.main.screen = pygame.display.set_mode((settings.CELL_SIZE * self.columns + settings.GRID_MARGIN[1] + settings.GRID_MARGIN[3],
-                                                    settings.CELL_SIZE * self.rows + settings.GRID_MARGIN[0] + settings.GRID_MARGIN[2]))
-
         # DEBUG print number of rows and columns
         print('grid initialized with: ' + str(self.rows) + ' rows and ' + str(self.columns) + ' columns')
 
@@ -203,7 +173,9 @@ class Grid:
         if self.bombs_num >= self.size - 8:
             raise ValueError('too many bombs')
 
-        adjacents_cells_pos = [cell.pos for cell in self.get_adjacents_cells(first_clicked_cell_pos)]
+        # get adjacents cells of clicked cell to dont spawn bomb on then
+        adjacents_cells_pos = [cell.pos for cell in self.get_adjacents_cells(first_clicked_cell_pos) if
+                               cell is not None]
 
         # generate all bombs
         bombs_generated = 0
@@ -281,8 +253,8 @@ class Cell:
 
         self.main = main
         self.type = cell_type
-        self.pos = pos
-        # print('creaing cell (' + str(pos[0]) + ' ' + str(pos[1]) + ')')  # debug
+        self.pos = pos  # coordinates in the grid
+        # print('creating cell (' + str(pos[0]) + ' ' + str(pos[1]) + ')')  # debug
         self.revealed = False
         self.flagged = False
         self.exploded = False
@@ -291,28 +263,16 @@ class Cell:
     def render(self):
         # draw cover
         if not self.revealed and not self.flagged:
-            self.main.screen.blit(self.main.game.cell_cover_surface,
-                                  (settings.GRID_MARGIN[3] + self.pos[1] * settings.CELL_SIZE,
-                                   settings.GRID_MARGIN[0] + self.pos[0] * settings.CELL_SIZE))
-
+            self.main.screen.blit(self.main.game.images.cell_cover, gui_tools.grid_to_screen_pos(self.pos))
         # draw flag
         elif not self.revealed and self.flagged:
-            # TODO change from cover to flag surface
-            self.main.screen.blit(self.main.game.cell_flag_surface,
-                                  (settings.GRID_MARGIN[3] + self.pos[1] * settings.CELL_SIZE,
-                                   settings.GRID_MARGIN[0] + self.pos[0] * settings.CELL_SIZE))
+            self.main.screen.blit(self.main.game.images.cell_flag, gui_tools.grid_to_screen_pos(self.pos))
         # draw exploded bomb
         elif self.exploded:
-            # TODO change from cover to exploded surface
-            self.main.screen.blit(self.main.game.cell_exploded_bomb_surface,
-                                  (settings.GRID_MARGIN[3] + self.pos[1] * settings.CELL_SIZE,
-                                   settings.GRID_MARGIN[0] + self.pos[0] * settings.CELL_SIZE))
+            self.main.screen.blit(self.main.game.images.cell_exploded_bomb, gui_tools.grid_to_screen_pos(self.pos))
         # draw revealed
         else:
-            self.main.screen.blit(self.main.game.cell_dict[self.type],
-                                  (settings.GRID_MARGIN[3] + self.pos[1] * settings.CELL_SIZE,
-                                   settings.GRID_MARGIN[0] + self.pos[0] * settings.CELL_SIZE))
-            # print('revealed cell ' + str(self.pos) + ' rendered')  # debug
+            self.main.screen.blit(self.main.game.images.cell_dict[self.type], gui_tools.grid_to_screen_pos(self.pos))
 
     # reveal the cell
     def reveal(self):
@@ -325,9 +285,10 @@ class Cell:
             if self.type == 0:
                 for x in (-1, 0, 1):
                     for y in (-1, 0, 1):
-                        if 0 <= self.pos[0]-x < self.main.game.grid.rows and 0 <= self.pos[1]-y < self.main.game.grid.columns and not self.main.game.grid.list[self.pos[0]-x][self.pos[1]-y].type == -1:
-                            self.main.game.grid.list[self.pos[0]-x][self.pos[1]-y].reveal()
-
+                        if 0 <= self.pos[0] - x < self.main.game.grid.rows and 0 <= self.pos[
+                            1] - y < self.main.game.grid.columns and not self.main.game.grid.list[self.pos[0] - x][
+                                                                             self.pos[1] - y].type == -1:
+                            self.main.game.grid.list[self.pos[0] - x][self.pos[1] - y].reveal()
 
             # check if won
             self.main.game.grid.check_if_won()
