@@ -9,11 +9,11 @@
      - [ ] Menu button
      - [ ] Restart button
      - [ ] Improve bomb generation to make **less luck based**
+     - **Timer**  
+       - [ ] Art  
+       - [ ] Code
 -  **Save / Load**  
     - [ ] Code
--  **Timer**  
-     - [ ] Art  
-     - [ ] Code
 
 ---
 
@@ -27,3 +27,4 @@
     - [ ] Make audios
     - [ ] Code
     - [ ] Add option to **change volume**
+- [ ] MAYBE Change game state from dict to only a variable

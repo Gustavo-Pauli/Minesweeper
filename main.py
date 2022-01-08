@@ -6,21 +6,19 @@ import scripts.game as game
 
 class Main:
     def __init__(self):
-        # pygame.init()
-
-        self.screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))  # set menu window size
-        self.game_states = GameState('Game')
+        self.screen = None  # set menu window size
+        self.update_window_size(settings.START_WIDTH, settings.START_HEIGHT)
+        self.game_state = self.GameState('Game')
         self.clock = pygame.time.Clock()
 
-        # game states
-        self.menu = menu.MainMenu(self)
-        self.game = game.Game(self, 9, 9, 10)
-
-        # window
-        pygame.display.set_caption(settings.TITLE)
+        pygame.display.set_caption(settings.TITLE)  # set window title
 
         # global variables
         self.dt = 0
+
+        # game states
+        self.menu = menu.Menu(self)
+        self.game = game.Game(self, 9, 9, 10)
 
     def main_loop(self):
         # handle global events
@@ -33,13 +31,12 @@ class Main:
         self.update_dt()
 
         # handle game states
-        if self.game_states.list['Game']:
+        if self.game_state.list['Game']:
             self.game.update()
-        if self.game_states.list['Menu']:
-            # update menu
-            pass
+        if self.game_state.list['Menu']:
+            self.menu.update()
 
-        # print(self.clock.get_fps())
+        # print(self.clock.get_fps())  # print fps
 
         # update display (show things on screen)
         pygame.display.update()
@@ -48,18 +45,23 @@ class Main:
     def update_dt(self):
         self.dt = self.clock.tick(settings.MAX_FPS) / 1000
 
+    def update_window_size(self, width, height, resizable=False):
+        if resizable:
+            self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+        else:
+            self.screen = pygame.display.set_mode((width, height))
 
-class GameState:
-    def __init__(self, start_game_state):
-        # game states list
-        self.list = {'Menu': False, 'Game': False}
+    class GameState:
+        def __init__(self, start_game_state: str):
+            # list of possible game states
+            self.list = {'Menu': False, 'Game': False}
 
-        # raise error if invalid parameter is passed
-        if start_game_state not in self.list:
-            raise ValueError(start_game_state + ' is not a game state')
+            # raise error if invalid parameter is passed
+            if start_game_state not in self.list:
+                raise ValueError(start_game_state + ' is not a game state')
 
-        # set the initial game state to True
-        self.list[start_game_state] = True
+            # set the initial game state to True
+            self.list[start_game_state] = True
 
 
 if __name__ == '__main__':

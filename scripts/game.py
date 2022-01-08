@@ -1,9 +1,12 @@
 import pygame
 import random
 # from collections import namedtuple
+# from main import *
+# import main as main
 import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
+# from scripts.vector2 import *
 
 
 # gui, chronometer, finished etc
@@ -34,10 +37,10 @@ class Game:
 
     def update_window_size(self):
         # change window size accordingly to cells size
-        self.main.screen = pygame.display.set_mode((
-            (settings.CELL_SIZE * self.grid.columns + settings.LEFT_MARGIN + settings.RIGHT_MARGIN),
-            settings.CELL_SIZE * self.grid.rows + settings.GRID_MARGIN[0] + settings.GRID_MARGIN[2] +
-            settings.HUD_MARGIN[0] + settings.HUD_MARGIN[2] + settings.HUD_SIZE))
+        self.main.update_window_size(
+                settings.CELL_SIZE * self.grid.columns + settings.LEFT_MARGIN + settings.RIGHT_MARGIN,
+                settings.CELL_SIZE * self.grid.rows + settings.GRID_MARGIN[0] + settings.GRID_MARGIN[2] +
+                settings.HUD_MARGIN[0] + settings.HUD_MARGIN[2] + settings.HUD_SIZE)
 
     # ====== CHECK INPUTS
 
@@ -51,25 +54,25 @@ class Game:
         if right_clicked_cell is not None:
             self.right_click(right_clicked_cell)
 
-    def check_right_click(self):
+    def check_right_click(self) -> (int, int):
         if self.grid.block_input:
             return None
 
-        clicked_cell = None
+        clicked_cell_coordinates = None
         mouse_pos = pygame.mouse.get_pos()
 
         # find clicked cell
         if pygame.mouse.get_pressed(3)[2] and not self.clicked:
             self.clicked = True
 
-            grid_pos = gui_tools.screen_to_grid_pos(mouse_pos, self.grid.rows, self.grid.columns)
-            if grid_pos is not None:
-                clicked_cell = grid_pos
+            grid_cord = gui_tools.screen_to_grid_pos(mouse_pos, self.grid.rows, self.grid.columns)
+            if grid_cord is not None:
+                clicked_cell_coordinates = grid_cord
 
         if not pygame.mouse.get_pressed(3)[0] and not pygame.mouse.get_pressed(3)[2]:  # both mouse buttons
             self.clicked = False
 
-        return clicked_cell
+        return clicked_cell_coordinates
 
     def check_left_click(self):
         if self.grid.block_input:
@@ -160,7 +163,7 @@ class Grid:
                 self.list[i][j].render()
                 # print('rendering (' + str(x) + ' ' + str(y) + ')')  # debug
 
-    # ====== START
+    # ====== START FUNCTIONS
 
     # start the game (generate bombs and numbers, start timer, etc)
     def start_game(self, first_clicked_cell):
@@ -174,7 +177,7 @@ class Grid:
             raise ValueError('too many bombs')
 
         # get adjacents cells of clicked cell to dont spawn bomb on then
-        adjacents_cells_pos = [cell.pos for cell in self.get_adjacents_cells(first_clicked_cell_pos) if
+        adjacents_cells_pos = [cell.pos for cell in self.get_adjacent_cells(first_clicked_cell_pos) if
                                cell is not None]
 
         # generate all bombs
@@ -207,7 +210,7 @@ class Grid:
                 #         if 0 <= i-x < self.rows and 0 <= j-y < self.columns and self.list[i-x][j-y].type == -1:
                 #             nearby_bombs += 1
 
-                adjacents = self.get_adjacents_cells((i, j))  # get adjacentes cells
+                adjacents = self.get_adjacent_cells((i, j))  # get adjacentes cells
 
                 # check how many bombs are nearby
                 nearby_bombs = 0
@@ -231,7 +234,7 @@ class Grid:
             self.won = True
             self.block_input = True
 
-    def get_adjacents_cells(self, mid_cell):
+    def get_adjacent_cells(self, mid_cell):
         i, j = mid_cell  # mid cell location
 
         cells_list = [None] * 9
@@ -285,9 +288,9 @@ class Cell:
             if self.type == 0:
                 for x in (-1, 0, 1):
                     for y in (-1, 0, 1):
-                        if 0 <= self.pos[0] - x < self.main.game.grid.rows and 0 <= self.pos[
-                            1] - y < self.main.game.grid.columns and not self.main.game.grid.list[self.pos[0] - x][
-                                                                             self.pos[1] - y].type == -1:
+                        if 0 <= self.pos[0] - x < self.main.game.grid.rows\
+                                and 0 <= self.pos[1] - y < self.main.game.grid.columns\
+                                and not self.main.game.grid.list[self.pos[0] - x][self.pos[1] - y].type == -1:
                             self.main.game.grid.list[self.pos[0] - x][self.pos[1] - y].reveal()
 
             # check if won
