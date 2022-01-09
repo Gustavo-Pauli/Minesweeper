@@ -8,7 +8,7 @@ class Main:
     def __init__(self):
         self.screen = None  # set menu window size
         self.update_window_size(settings.START_WIDTH, settings.START_HEIGHT)
-        self.game_state = self.GameState('Game')
+        self.game_state = self.GameState('Menu')
         self.clock = pygame.time.Clock()
 
         pygame.display.set_caption(settings.TITLE)  # set window title
@@ -18,7 +18,9 @@ class Main:
 
         # game states
         self.menu = menu.Menu(self)
-        self.game = game.Game(self, 9, 9, 10)
+        self.game = None
+        # self.game = game.Game(self, settings.game.easy.ROWS, settings.game.easy.COLUMNS, settings.game.easy.BOMBS)
+
 
     def main_loop(self):
         # handle global events
@@ -45,7 +47,7 @@ class Main:
     def update_dt(self):
         self.dt = self.clock.tick(settings.MAX_FPS) / 1000
 
-    def update_window_size(self, width, height, resizable=False):
+    def update_window_size(self, width, height, resizable=True):
         if resizable:
             self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         else:

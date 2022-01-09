@@ -18,22 +18,22 @@ class Game:
 
         self.update_window_size()  # change window size relative to current grid size
 
-        self.clicked = False  # variable used to don't allow multiple clicks if holding mouse button
+        self.clicked = True  # variable used to don't allow multiple clicks if holding mouse button
 
     def update(self):
         self.check_input()
 
         # render
-        self.main.screen.fill(settings.BACKGROUND_COLOR)
+        self.main.screen.fill(settings.color.BACKGROUND)
         self.grid.render()
 
         # DEBUG show text if won or losed
         if self.grid.won:
-            gui_tools.text_renderer(self.main.screen, 'You Won!', 'center', 64, (
-                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2), settings.WHITE)
+            gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
+                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
         if self.grid.lost:
-            gui_tools.text_renderer(self.main.screen, 'You Lost!', 'center', 64, (
-                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2), settings.WHITE)
+            gui_tools.text_renderer(self.main.screen, 'You Lost!', 64, (
+                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
 
     def update_window_size(self):
         # change window size accordingly to cells size

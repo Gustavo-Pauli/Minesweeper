@@ -8,8 +8,9 @@ import pygame
 # ========== SETTINGS ==========
 
 # screen
-START_WIDTH = 476
-START_HEIGHT = 536
+# medium 444x504
+START_WIDTH = 316
+START_HEIGHT = 376
 TITLE = 'Minesweeper'
 MAX_FPS = 300
 
@@ -26,24 +27,56 @@ RIGHT_MARGIN = max(HUD_MARGIN[1], GRID_MARGIN[1])
 
 # audio
 
-# game
+# ========== GAME ==========
+
+
+@dataclass
+class game:
+    @dataclass
+    class easy:
+        ROWS = 9
+        COLUMNS = 9
+        BOMBS = 10
+
+    @dataclass
+    class medium:
+        ROWS = 13
+        COLUMNS = 13
+        BOMBS = 25
+
+    @dataclass
+    class hard:
+        ROWS = 16
+        COLUMNS = 16
+        BOMBS = 40
+
 
 # ========== COLORS ==========
 
-WHITE = pygame.color.Color(255, 255, 255)
 
-BACKGROUND_COLOR = pygame.color.Color(16, 28, 38)
+@dataclass
+class color:
+    WHITE = pygame.color.Color(255, 255, 255)
+
+    BACKGROUND = pygame.color.Color(16, 28, 38)
+
 
 # ========== FILES PATHS ==========
+
 
 @dataclass
 class path:
     # ====== FONTS
-    FONT = 'assets/fonts/Roboto-Regular.ttf'
+    FONT = 'assets/fonts/Bahnschrift-LightCondensed.ttf'
+    FONT_SEMIBOLD_CONDENSED = 'assets/fonts/Bahnschrift-BoldSemiCondensed.ttf'
+    FONT_CONDENSED = 'assets/fonts/Bahnschrift-Condensed.ttf'
+    FONT_REGULAR = 'assets/fonts/Bahnschrift-Regular.ttf'
 
     # ====== IMAGES
     # MENU
     PLAY_BUTTON = 'assets/art/menu/PlayButton.png'
+    LEFT_ARROW = 'assets/art/menu/LeftArrow.png'
+    RIGHT_ARROW = 'assets/art/menu/RightArrow.png'
 
     # GAME
     CELL_COVER = 'assets/art/game/Cover.png'

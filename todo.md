@@ -1,10 +1,9 @@
 ## TODO
 
 -  **Menu**  
-     - [ ] Prototype
-     - [ ] Buttons  
-     - [ ] Refinement  
-         - [ ] Clamp min and max grid size
+     - [x] Prototype
+     - [x] Buttons  
+     - [ ] Refinement
 -  **Game**  
      - [ ] Menu button
      - [ ] Restart button
@@ -13,7 +12,7 @@
        - [ ] Art  
        - [ ] Code
 -  **Save / Load**  
-    - [ ] Code
+     - [ ] Code
 
 ---
 
@@ -22,7 +21,8 @@
 - **GUI**
     - [ ] Add option to **change cell color**
     - [ ] Add option to **change cell size**
-    - [ ] Add text input to select custom grid size
+    - [ ] Custom grid size input
+    - [ ] Clamp min and max grid size on custom difficulty
 - **SFX**
     - [ ] Make audios
     - [ ] Code

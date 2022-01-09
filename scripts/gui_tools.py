@@ -3,8 +3,8 @@ import scripts.settings as settings
 from scripts.vector2 import *
 
 
-def text_renderer(screen_surface, text, align, size, pos, color):
-    font = pygame.font.Font(settings.path.FONT, size)
+def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos: (int, int), align='center', color=settings.color.WHITE, font_path=settings.path.FONT):
+    font = pygame.font.Font(font_path, size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
 
@@ -59,7 +59,7 @@ def screen_to_grid_pos(pos, rows, columns):
 
 # creates clickable buttons
 class Button:
-    def __init__(self, screen: pygame.surface, image: pygame.surface, pos: [float, float], align='center', scale=1.0):
+    def __init__(self, screen: pygame.surface, image: pygame.surface, pos=(0, 0), align='center', scale=1.0):
         self.screen = screen
         self.image = pygame.transform.smoothscale(image, (int(image.get_width() * scale), int(image.get_height() * scale)))
         self.pos = pos
@@ -86,7 +86,7 @@ class Button:
 
         return action
 
-    def update_pos(self, new_pos):
+    def update_pos(self, new_pos: [int, int]):
         self.pos = new_pos
 
         # alignment

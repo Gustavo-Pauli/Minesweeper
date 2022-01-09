@@ -38,6 +38,8 @@ class GameImages:
 class MenuImages:
     def __init__(self):
         self.play = gui_tools.import_image(settings.path.PLAY_BUTTON, alpha=True)
+        self.left_arrow = gui_tools.import_image(settings.path.LEFT_ARROW, alpha=True)
+        self.right_arrow = gui_tools.import_image(settings.path.RIGHT_ARROW, alpha=True)
 
 
 
