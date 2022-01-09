@@ -67,7 +67,7 @@ class color:
 @dataclass
 class path:
     # ====== FONTS
-    FONT = 'assets/fonts/Bahnschrift-LightCondensed.ttf'
+    FONT_LIGHT_CONDENSED = 'assets/fonts/Bahnschrift-LightCondensed.ttf'
     FONT_SEMIBOLD_CONDENSED = 'assets/fonts/Bahnschrift-BoldSemiCondensed.ttf'
     FONT_CONDENSED = 'assets/fonts/Bahnschrift-Condensed.ttf'
     FONT_REGULAR = 'assets/fonts/Bahnschrift-Regular.ttf'

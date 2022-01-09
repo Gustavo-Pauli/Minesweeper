@@ -3,7 +3,7 @@ import scripts.settings as settings
 from scripts.vector2 import *
 
 
-def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos: (int, int), align='center', color=settings.color.WHITE, font_path=settings.path.FONT):
+def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos: (int, int), align='center', color=settings.color.WHITE, font_path=settings.path.FONT_LIGHT_CONDENSED):
     font = pygame.font.Font(font_path, size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
