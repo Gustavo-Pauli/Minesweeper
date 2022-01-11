@@ -65,7 +65,8 @@ class Button:
         self.pos = pos
         self.rect = self.image.get_rect()
         self.align = align
-        self.clicked = False
+        self.is_holding_click = False
+        self.clicked_this_frame = False
 
         self.update_pos(pos)
 
@@ -78,11 +79,11 @@ class Button:
 
         # check if clicked
         if self.rect.collidepoint(mouse_pos):
-            if pygame.mouse.get_pressed(3)[0] and not self.clicked:
-                self.clicked = True
+            if pygame.mouse.get_pressed(3)[0] and not self.is_holding_click:
+                self.is_holding_click = True
                 action = True
         if not pygame.mouse.get_pressed(3)[0]:
-            self.clicked = False
+            self.is_holding_click = False
 
         return action
 

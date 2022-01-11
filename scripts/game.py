@@ -6,6 +6,7 @@ import random
 import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
+import scripts.menu as menu
 # from scripts.vector2 import *
 
 
@@ -13,10 +14,12 @@ import scripts.gui_tools as gui_tools
 class Game:
     def __init__(self, main, rows, columns, bombs):
         self.main = main
-        self.images = scripts.images.GameImages('blue')  # initialize images
+        self.images = scripts.images.GameImages('blue')  # initialize images TODO implement this 'blue'
         self.grid = Grid(self.main, rows, columns, bombs)
 
         self.update_window_size()  # change window size relative to current grid size
+
+        self.ui = UI(self)
 
         self.clicked = True  # variable used to don't allow multiple clicks if holding mouse button
 
@@ -26,14 +29,7 @@ class Game:
         # render
         self.main.screen.fill(settings.color.BACKGROUND)
         self.grid.render()
-
-        # DEBUG show text if won or losed
-        if self.grid.won:
-            gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
-                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
-        if self.grid.lost:
-            gui_tools.text_renderer(self.main.screen, 'You Lost!', 64, (
-                pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+        self.ui.render()
 
     def update_window_size(self):
         # change window size accordingly to cells size
@@ -46,6 +42,10 @@ class Game:
 
     # check all inputs
     def check_input(self):
+        # ui input
+        self.ui.check_input()
+
+        # grid input
         left_clicked_cell = self.check_left_click()
         if left_clicked_cell is not None:
             self.left_click(left_clicked_cell)
@@ -55,9 +55,6 @@ class Game:
             self.right_click(right_clicked_cell)
 
     def check_right_click(self) -> (int, int):
-        if self.grid.block_input:
-            return None
-
         clicked_cell_coordinates = None
         mouse_pos = pygame.mouse.get_pos()
 
@@ -74,10 +71,7 @@ class Game:
 
         return clicked_cell_coordinates
 
-    def check_left_click(self):
-        if self.grid.block_input:
-            return None
-
+    def check_left_click(self) -> (int, int):
         clicked_cell = None
         mouse_pos = pygame.mouse.get_pos()
 
@@ -96,6 +90,9 @@ class Game:
     # ====== INPUT ACTIONS
 
     def left_click(self, clicked_cell_pos):
+        if self.grid.block_input:
+            return None
+
         clicked_cell = self.grid.list[clicked_cell_pos[0]][clicked_cell_pos[1]]
 
         # don't do nothing if the clicked cell is flagged
@@ -126,10 +123,27 @@ class Game:
         clicked_cell.reveal()
 
     def right_click(self, clicked_cell):
+        if self.grid.block_input:
+            return None
+
         i = clicked_cell[0]
         j = clicked_cell[1]
 
         self.grid.list[i][j].flag()
+
+    # ====== WIN / LOST SCREEN
+
+    '''
+    def render_won_screen(self):
+        # DEBUG
+        gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
+            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+
+    def render_lost_screen(self):
+        # DEBUG
+        gui_tools.text_renderer(self.main.screen, 'You Lost!', 64, (
+            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+    '''
 
 
 # generate grid of cells until valid, verify if won
@@ -234,9 +248,8 @@ class Grid:
             self.won = True
             self.block_input = True
 
-    def get_adjacent_cells(self, mid_cell):
-        i, j = mid_cell  # mid cell location
-
+    def get_adjacent_cells(self, mid_cell_cord: (int, int)):
+        i, j = mid_cell_cord  # mid cell location
         cells_list = [None] * 9
 
         # add all valid adjacents cells to cell_list
@@ -302,3 +315,44 @@ class Cell:
             self.flagged = False
         else:
             self.flagged = True
+
+
+class UI:
+    def __init__(self, game: Game):
+        self.main = game.main
+        self.game = game
+
+        self.menu_button = gui_tools.Button(self.main.screen, self.game.images.menu, (settings.LEFT_MARGIN, settings.HUD_MARGIN[0]), 'topleft')
+        self.restart_button = gui_tools.Button(self.main.screen, self.game.images.restart, (self.main.screen.get_width() - settings.RIGHT_MARGIN, settings.HUD_MARGIN[0]), 'topright')
+
+    def update(self):
+        pass
+
+    def check_input(self):
+        if self.menu_button.check_collision() and not self.game.clicked:
+            self.main.menu = menu.Menu(self.main)
+            self.main.game_state.list['Menu'] = True
+            self.main.game_state.list['Game'] = False
+
+        if self.restart_button.check_collision() and not self.game.clicked:
+            self.main.game = Game(self.main, self.game.grid.rows, self.game.grid.columns, self.game.grid.bombs_num)
+
+    def render(self):
+        self.menu_button.render()
+        self.restart_button.render()
+
+        # if won or lost (Win/Lose screen)
+        if self.main.game.grid.won:
+            self.__render_won_screen()
+        if self.main.game.grid.lost:
+            self.__render_lost_screen()
+
+    def __render_lost_screen(self):
+        # DEBUG
+        gui_tools.text_renderer(self.main.screen, 'You Lost!', 64, (
+            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+
+    def __render_won_screen(self):
+        # DEBUG
+        gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
+            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))

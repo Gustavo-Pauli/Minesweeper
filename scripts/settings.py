@@ -16,10 +16,10 @@ MAX_FPS = 300
 
 # sizes
 CELL_SIZE = 32
-HUD_SIZE = 32
+HUD_SIZE = 24
 
-HUD_MARGIN = (14, 14, 14, 14)
-GRID_MARGIN = (14, 14, 14, 14)  # top, right, bottom, left
+HUD_MARGIN = (14, 14, 14, 14)  # top, right, bottom, left
+GRID_MARGIN = (0, 14, 14, 14)  # top, right, bottom, left
 
 LEFT_MARGIN = max(HUD_MARGIN[3], GRID_MARGIN[3])
 RIGHT_MARGIN = max(HUD_MARGIN[1], GRID_MARGIN[1])
@@ -78,7 +78,7 @@ class path:
     LEFT_ARROW = 'assets/art/menu/LeftArrow.png'
     RIGHT_ARROW = 'assets/art/menu/RightArrow.png'
 
-    # GAME
+    # GAME GRID
     CELL_COVER = 'assets/art/game/Cover.png'
     CELL_FLAG = 'assets/art/game/Flag.png'
     CELL_BOMB = 'assets/art/game/Bomb.png'
@@ -92,3 +92,7 @@ class path:
     CELL_6 = 'assets/art/game/6.png'
     CELL_7 = 'assets/art/game/7.png'
     CELL_8 = 'assets/art/game/8.png'
+
+    # GAME UI
+    MENU = 'assets/art/game/ui/MenuButton.png'
+    RESTART = 'assets/art/game/ui/RestartButton.png'

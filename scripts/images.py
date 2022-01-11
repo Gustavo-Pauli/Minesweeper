@@ -6,6 +6,7 @@ class GameImages:
     def __init__(self, color='blue'):
         # TODO determine which COLOR to load
 
+        # GRID
         self.cell_cover = gui_tools.import_image(settings.path.CELL_COVER, settings.CELL_SIZE / 128)
         self.cell_bomb = gui_tools.import_image(settings.path.CELL_BOMB, settings.CELL_SIZE / 128)
         self.cell_exploded_bomb = gui_tools.import_image(settings.path.CELL_EXPLODED_BOMB, settings.CELL_SIZE / 128)
@@ -19,6 +20,10 @@ class GameImages:
         self.cell_6 = gui_tools.import_image(settings.path.CELL_6, settings.CELL_SIZE / 128)
         self.cell_7 = gui_tools.import_image(settings.path.CELL_7, settings.CELL_SIZE / 128)
         self.cell_8 = gui_tools.import_image(settings.path.CELL_8, settings.CELL_SIZE / 128)
+
+        # UI
+        self.menu = gui_tools.import_image(settings.path.MENU, 0.375, True)
+        self.restart = gui_tools.import_image(settings.path.RESTART, 0.375, True)
 
         # add bomb and num images to cell_dict
         self.cell_dict = {

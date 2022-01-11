@@ -8,6 +8,8 @@
      - [ ] Menu button
      - [ ] Restart button
      - [ ] Improve bomb generation to make **less luck based**
+     - [ ] Game over screen
+     - [ ] You win screen
      - **Timer**  
        - [ ] Art  
        - [ ] Code

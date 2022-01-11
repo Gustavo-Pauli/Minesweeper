@@ -75,6 +75,8 @@ class MainMenu:
             self.main.game_state.list['Menu'] = False
             self.main.game_state.list['Game'] = True
 
+        # ====== INPUT
+
         if self.left_arrow_button.check_collision():
             if self.selected_difficulty != 0:
                 self.selected_difficulty -= 1
@@ -83,12 +85,12 @@ class MainMenu:
             if self.selected_difficulty != 3:
                 self.selected_difficulty += 1
 
-        # ====== DRAW
+        # ====== RENDER
 
-        # draw background
+        # render background
         self.main.screen.fill(settings.color.BACKGROUND)
 
-        # draw buttons
+        # render buttons
         self.play_button.render()
         self.left_arrow_button.render()
         self.right_arrow_button.render()

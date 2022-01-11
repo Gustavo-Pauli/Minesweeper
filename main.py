@@ -21,7 +21,6 @@ class Main:
         self.game = None
         # self.game = game.Game(self, settings.game.easy.ROWS, settings.game.easy.COLUMNS, settings.game.easy.BOMBS)
 
-
     def main_loop(self):
         # handle global events
         for event in pygame.event.get():
@@ -47,7 +46,7 @@ class Main:
     def update_dt(self):
         self.dt = self.clock.tick(settings.MAX_FPS) / 1000
 
-    def update_window_size(self, width, height, resizable=True):
+    def update_window_size(self, width, height, resizable=False):
         if resizable:
             self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         else:
