@@ -5,8 +5,8 @@
      - [x] Buttons  
      - [ ] Refinement
 -  **Game**  
-     - [ ] Menu button
-     - [ ] Restart button
+     - [x] Menu button
+     - [x] Restart button
      - [ ] Improve bomb generation to make **less luck based**
      - [ ] Game over screen
      - [ ] You win screen
