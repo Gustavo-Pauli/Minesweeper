@@ -379,8 +379,7 @@ class UI:
         def __init__(self, ui):
             self.main = ui.game.main
             self.ui = ui
-
-            self.pos = (158, self.ui.margin[0] + 2)
+            self.pos = (self.main.screen.get_width() // 2, self.ui.margin[0] + 4)
             self.started = False
             self.stopped = False
             self.start_time = 0
@@ -396,9 +395,9 @@ class UI:
 
         def render(self):
             if self.started:
-                gui_tools.text_renderer(self.main.screen, time.ctime(self.elapsed_time)[14:19], 24, self.pos, 'midtop', font_path=settings.path.FONT_CONDENSED)
+                gui_tools.text_renderer(self.main.screen, time.ctime(self.elapsed_time)[14:19], 21, self.pos, 'midtop', font_path=settings.path.FONT_REGULAR)
             else:
-                gui_tools.text_renderer(self.main.screen, '00:00', 24, self.pos, 'midtop', font_path=settings.path.FONT_CONDENSED)
+                gui_tools.text_renderer(self.main.screen, '00:00', 21, self.pos, 'midtop', font_path=settings.path.FONT_REGULAR)
 
         def start_timer(self):
             self.started = True

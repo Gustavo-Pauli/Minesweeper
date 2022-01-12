@@ -24,12 +24,10 @@ GRID_MARGIN = (0, 14, 14, 14)  # top, right, bottom, left
 LEFT_MARGIN = max(HUD_MARGIN[3], GRID_MARGIN[3])
 RIGHT_MARGIN = max(HUD_MARGIN[1], GRID_MARGIN[1])
 
-
 # audio
 
+
 # ========== GAME ==========
-
-
 @dataclass
 class game:
     @dataclass
@@ -52,8 +50,6 @@ class game:
 
 
 # ========== COLORS ==========
-
-
 @dataclass
 class color:
     WHITE = pygame.color.Color(255, 255, 255)
@@ -62,8 +58,6 @@ class color:
 
 
 # ========== FILES PATHS ==========
-
-
 @dataclass
 class path:
     # ====== FONTS
