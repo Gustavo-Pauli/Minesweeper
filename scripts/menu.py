@@ -71,7 +71,7 @@ class MainMenu:
             elif self.selected_difficulty == 2:
                 self.main.game = game.Game(self.main, settings.game.hard.ROWS, settings.game.hard.COLUMNS, settings.game.hard.BOMBS)
             elif self.selected_difficulty == 3:
-                self.main.game = game.Game(self.main, 16, 32, 30)
+                self.main.game = game.Game(self.main, 16, 32, 7)
             self.main.game_state.list['Menu'] = False
             self.main.game_state.list['Game'] = True
 

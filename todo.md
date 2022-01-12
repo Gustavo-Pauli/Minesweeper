@@ -1,10 +1,10 @@
 ## TODO
 
--  **Menu**  
+- **Menu**  
      - [x] Prototype
      - [x] Buttons  
      - [ ] Refinement
--  **Game**  
+- **Game**  
      - [x] Menu button
      - [x] Restart button
      - [ ] Improve bomb generation to make **less luck based**
@@ -12,8 +12,8 @@
      - [ ] You win screen
      - **Timer**  
        - [ ] Art  
-       - [ ] Code
--  **Save / Load**  
+       - [x] Code
+- **Save / Load**  
      - [ ] Code
 
 ---

@@ -1,8 +1,10 @@
 import pygame
 import random
+import time
 # from collections import namedtuple
 # from main import *
 # import main as main
+import main
 import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
@@ -25,6 +27,7 @@ class Game:
 
     def update(self):
         self.check_input()
+        self.ui.update()
 
         # render
         self.main.screen.fill(settings.color.BACKGROUND)
@@ -104,20 +107,9 @@ class Game:
             self.grid.start_game(clicked_cell_pos)
             self.grid.started = True
 
-        # if clicked on a bomb TODO transfer this to a function
+        # if clicked on a bomb
         if clicked_cell.type == -1:
-            # end game, stop game inputs
-            self.grid.block_input = True
-            self.grid.lost = True
-
-            # reveal all bombs
-            for i in range(self.grid.rows):
-                for j in range(self.grid.columns):
-                    if self.grid.list[i][j].type == -1:  # if is a bomb
-                        self.grid.list[i][j].reveal()
-
-            # change clicked bomb to exploded image
-            clicked_cell.exploded = True
+            self.grid.lost_game(clicked_cell)
 
         # reveal
         clicked_cell.reveal()
@@ -177,12 +169,33 @@ class Grid:
                 self.list[i][j].render()
                 # print('rendering (' + str(x) + ' ' + str(y) + ')')  # debug
 
-    # ====== START FUNCTIONS
-
     # start the game (generate bombs and numbers, start timer, etc)
     def start_game(self, first_clicked_cell):
         self.generate_bombs(first_clicked_cell)
         self.generate_numbers()
+        self.main.game.ui.timer.start_timer()
+
+    def lost_game(self, clicked_bomb_cell):
+        # end game, stop game inputs, stop timer
+        self.block_input = True
+        self.lost = True
+        self.main.game.ui.timer.end_timer()
+
+        # reveal all bombs
+        for i in range(self.rows):
+            for j in range(self.columns):
+                if self.list[i][j].type == -1:  # if is a bomb
+                    self.list[i][j].reveal()
+
+        # change clicked bomb to exploded image
+        clicked_bomb_cell.exploded = True
+
+    def won_game(self):
+        self.won = True
+        self.block_input = True
+        self.main.game.ui.timer.end_timer()
+
+    # ====== START FUNCTIONS
 
     # generate bombs in random locations
     def generate_bombs(self, first_clicked_cell_pos):
@@ -245,8 +258,7 @@ class Grid:
     # check if all non-bomb cells are open
     def check_if_won(self):
         if not self.lost and self.size - self.bombs_num == self.revealed_cells:
-            self.won = True
-            self.block_input = True
+            self.won_game()
 
     def get_adjacent_cells(self, mid_cell_cord: (int, int)):
         i, j = mid_cell_cord  # mid cell location
@@ -318,15 +330,19 @@ class Cell:
 
 
 class UI:
-    def __init__(self, game: Game):
+    def __init__(self, game):
         self.main = game.main
         self.game = game
 
-        self.menu_button = gui_tools.Button(self.main.screen, self.game.images.menu, (settings.LEFT_MARGIN, settings.HUD_MARGIN[0]), 'topleft')
-        self.restart_button = gui_tools.Button(self.main.screen, self.game.images.restart, (self.main.screen.get_width() - settings.RIGHT_MARGIN, settings.HUD_MARGIN[0]), 'topright')
+        self.margin = [settings.HUD_MARGIN[0], settings.RIGHT_MARGIN, settings.HUD_MARGIN[2], settings.LEFT_MARGIN]
+
+        self.timer = self.Timer(self)
+
+        self.menu_button = gui_tools.Button(self.main.screen, self.game.images.menu, (self.margin[3], self.margin[0]), 'topleft')
+        self.restart_button = gui_tools.Button(self.main.screen, self.game.images.restart, (self.main.screen.get_width() - self.margin[1], self.margin[0]), 'topright')
 
     def update(self):
-        pass
+        self.timer.update()
 
     def check_input(self):
         if self.menu_button.check_collision() and not self.game.clicked:
@@ -340,6 +356,7 @@ class UI:
     def render(self):
         self.menu_button.render()
         self.restart_button.render()
+        self.timer.render()
 
         # if won or lost (Win/Lose screen)
         if self.main.game.grid.won:
@@ -356,3 +373,36 @@ class UI:
         # DEBUG
         gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
             pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+
+    # TODO passing game class instance leave room for errors, cause if instanced in wrong order the program may crash
+    class Timer:
+        def __init__(self, ui):
+            self.main = ui.game.main
+            self.ui = ui
+
+            self.pos = (158, self.ui.margin[0] + 2)
+            self.started = False
+            self.stopped = False
+            self.start_time = 0
+            self.elapsed_time = 0
+
+        def update(self):
+            if self.started and not self.stopped:
+                # update elapsed time
+                self.elapsed_time = time.monotonic() - self.start_time
+
+            if self.started and not self.stopped and self.elapsed_time > 3599:
+                self.elapsed_time = 3599
+
+        def render(self):
+            if self.started:
+                gui_tools.text_renderer(self.main.screen, time.ctime(self.elapsed_time)[14:19], 24, self.pos, 'midtop', font_path=settings.path.FONT_CONDENSED)
+            else:
+                gui_tools.text_renderer(self.main.screen, '00:00', 24, self.pos, 'midtop', font_path=settings.path.FONT_CONDENSED)
+
+        def start_timer(self):
+            self.started = True
+            self.start_time = time.monotonic()
+
+        def end_timer(self):
+            self.stopped = True

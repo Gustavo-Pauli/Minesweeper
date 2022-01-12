@@ -3,11 +3,12 @@ import scripts.settings as settings
 from scripts.vector2 import *
 
 
-def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos: (int, int), align='center', color=settings.color.WHITE, font_path=settings.path.FONT_LIGHT_CONDENSED):
+def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos=(0, 0), align='center', color=settings.color.WHITE, font_path=settings.path.FONT_LIGHT_CONDENSED):
     font = pygame.font.Font(font_path, size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
 
+    '''
     if align == 'center':
         text_rect.center = pos
     elif align == 'left':
@@ -16,6 +17,36 @@ def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos: (in
         text_rect.bottomright = pos
     else:
         raise ValueError('Align option not valid')
+    '''
+
+    if align == 'center':
+        text_rect.center = pos
+    elif align == 'top':
+        text_rect.top = pos
+    elif align == 'left':
+        text_rect.left = pos
+    elif align == 'bottom':
+        text_rect.bottom = pos
+    elif align == 'right':
+        text_rect.right = pos
+    elif align == 'topleft':
+        text_rect.topleft = pos
+    elif align == 'midleft':
+        text_rect.midleft = pos
+    elif align == 'bottomleft':
+        text_rect.bottomleft = pos
+    elif align == 'midbottom':
+        text_rect.midbottom = pos
+    elif align == 'bottomright':
+        text_rect.bottomright = pos
+    elif align == 'midright':
+        text_rect.midright = pos
+    elif align == 'topright':
+        text_rect.topright = pos
+    elif align == 'midtop':
+        text_rect.midtop = pos
+    else:
+        raise ValueError("'" + align + "' is not a valid align option")
 
     screen_surface.blit(text_surface, text_rect)
 
@@ -92,28 +123,30 @@ class Button:
 
         # alignment
         if self.align == 'center':
-            self.rect.center = (self.pos[0], self.pos[1])
+            self.rect.center = self.pos
         elif self.align == 'top':
-            self.rect.top = (self.pos[0], self.pos[1])
+            self.rect.top = self.pos
         elif self.align == 'left':
-            self.rect.left = (self.pos[0], self.pos[1])
+            self.rect.left = self.pos
         elif self.align == 'bottom':
-            self.rect.bottom = (self.pos[0], self.pos[1])
+            self.rect.bottom = self.pos
         elif self.align == 'right':
-            self.rect.right = (self.pos[0], self.pos[1])
+            self.rect.right = self.pos
         elif self.align == 'topleft':
-            self.rect.topleft = (self.pos[0], self.pos[1])
+            self.rect.topleft = self.pos
         elif self.align == 'midleft':
-            self.rect.midleft = (self.pos[0], self.pos[1])
+            self.rect.midleft = self.pos
         elif self.align == 'bottomleft':
-            self.rect.bottomleft = (self.pos[0], self.pos[1])
+            self.rect.bottomleft = self.pos
         elif self.align == 'midbottom':
-            self.rect.midbottom = (self.pos[0], self.pos[1])
+            self.rect.midbottom = self.pos
         elif self.align == 'bottomright':
-            self.rect.bottomright = (self.pos[0], self.pos[1])
+            self.rect.bottomright = self.pos
         elif self.align == 'midright':
-            self.rect.midright = (self.pos[0], self.pos[1])
+            self.rect.midright = self.pos
         elif self.align == 'topright':
-            self.rect.topright = (self.pos[0], self.pos[1])
+            self.rect.topright = self.pos
+        elif self.align == 'midtop':
+            self.rect.midtop = self.pos
         else:
             raise ValueError("'" + self.align + "' is not a valid align option")
