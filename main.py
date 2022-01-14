@@ -69,7 +69,7 @@ class Main:
         except (IOError, json.decoder.JSONDecodeError):
             with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
                 # create base save dictionary
-                self.save['score'] = {0: 'None', 1: 'None', 2: 'None'}
+                self.save['score'] = {'0': 'None', '1': 'None', '2': 'None'}
                 file.close()
 
     class GameState:

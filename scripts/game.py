@@ -149,31 +149,20 @@ class Game:
 
     def save_game(self):
         # save if won and is the best time
-        # TODO change this check to implementations locations
+        if not os.path.exists(settings.path.SAVE_FOLDER):
+            os.makedirs(settings.path.SAVE_FOLDER)
 
-        # score
+        print(self.main.save)
+
+        # save score
         if self.grid.won and self.main.game.difficulty != 3 and\
-                (self.main.save['score'][self.main.game.difficulty] == 'None' or
-                 self.ui.timer.elapsed_time < self.main.save['score'][self.main.game.difficulty]):
-            self.main.save['score'][self.main.game.difficulty] = floor(self.ui.timer.elapsed_time)
+                (self.main.save['score'][str(self.main.game.difficulty)] == 'None' or
+                 self.ui.timer.elapsed_time < self.main.save['score'][str(self.main.game.difficulty)]):
+            self.main.save['score'][str(self.main.game.difficulty)] = floor(self.ui.timer.elapsed_time)
 
         with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
             json.dump(self.main.save, file, ensure_ascii=False, indent=4)
             file.close()
-
-    '''def load(self):
-        if not os.path.exists(settings.path.SAVE_FOLDER):
-            os.makedirs(settings.path.SAVE_FOLDER)
-
-        try:
-            with open(settings.path.SAVE, 'r', encoding='utf-8') as file:
-                self.main.save = json.load(file)
-                file.close()
-        except (IOError, json.decoder.JSONDecodeError):
-            with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
-                # create base save dictionary
-                self.main.save['score'] = {0: 'None', 1: 'None', 2: 'None'}
-                file.close()'''
 
 
 # generate grid of cells until valid, verify if won
