@@ -102,12 +102,12 @@ class MainMenu:
             gui_tools.text_renderer(self.main.screen, 'MEDIUM', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '12x12', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
             if self.main.save['score']['1'] != 'None':
-                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divdod(self.main.save['score']['1'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
+                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divmod(self.main.save['score']['1'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
         elif self.selected_difficulty == 2:
             gui_tools.text_renderer(self.main.screen, 'HARD', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '16x16', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
             if self.main.save['score']['2'] != 'None':
-                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divdod(self.main.save['score']['2'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
+                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divmod(self.main.save['score']['2'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
         elif self.selected_difficulty == 3:
             gui_tools.text_renderer(self.main.screen, 'CUSTOM', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '00x00', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
