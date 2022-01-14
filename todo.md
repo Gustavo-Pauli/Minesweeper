@@ -11,10 +11,12 @@
      - [ ] Game over screen
      - [ ] You win screen
      - **Timer**  
-       - [ ] Art  
+       - [x] Art  
        - [x] Code
 - **Save / Load**  
      - [ ] Code
+- **Fix**
+  - Menu button image size is 62x62 and not 64x64
 
 ---
 

@@ -1,5 +1,6 @@
 # CONSTANTS
 from dataclasses import dataclass
+import os.path
 
 import pygame
 
@@ -23,6 +24,7 @@ GRID_MARGIN = (0, 14, 14, 14)  # top, right, bottom, left
 
 LEFT_MARGIN = max(HUD_MARGIN[3], GRID_MARGIN[3])
 RIGHT_MARGIN = max(HUD_MARGIN[1], GRID_MARGIN[1])
+
 
 # audio
 
@@ -48,6 +50,28 @@ class game:
         COLUMNS = 16
         BOMBS = 40
 
+    DIFF_LIST = [[easy.ROWS, easy.COLUMNS, easy.BOMBS],
+                 [medium.ROWS, medium.COLUMNS, medium.BOMBS],
+                 [hard.ROWS, hard.COLUMNS, hard.BOMBS]]
+
+    DIFF_DICT = {
+        0: {
+            'rows': easy.ROWS,
+            'columns': easy.COLUMNS,
+            'bombs': easy.BOMBS
+        },
+        1: {
+            'rows': medium.ROWS,
+            'columns': medium.COLUMNS,
+            'bombs': medium.BOMBS
+        },
+        2: {
+            'rows': hard.ROWS,
+            'columns': hard.COLUMNS,
+            'bombs': hard.BOMBS
+        }
+    }
+
 
 # ========== COLORS ==========
 @dataclass
@@ -60,6 +84,9 @@ class color:
 # ========== FILES PATHS ==========
 @dataclass
 class path:
+    SAVE_FOLDER = os.path.expandvars(r'%LOCALAPPDATA%\Modern Minesweeper')
+    SAVE = os.path.expandvars(r'%LOCALAPPDATA%\Modern Minesweeper\save.json')
+
     # ====== FONTS
     FONT_LIGHT_CONDENSED = 'assets/fonts/Bahnschrift-LightCondensed.ttf'
     FONT_SEMIBOLD_CONDENSED = 'assets/fonts/Bahnschrift-BoldSemiCondensed.ttf'

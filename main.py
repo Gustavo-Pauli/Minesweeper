@@ -1,7 +1,9 @@
-import pygame, sys
-import scripts.settings as settings
+import json
+import os.path
+import pygame
+import sys
 import scripts.menu as menu
-import scripts.game as game
+import scripts.settings as settings
 
 
 class Main:
@@ -19,6 +21,10 @@ class Main:
         # game states
         self.menu = menu.Menu(self)
         self.game = None
+
+        self.save = {}  # all attributes in save json file
+        self.load_save()
+
         # self.game = game.Game(self, settings.game.easy.ROWS, settings.game.easy.COLUMNS, settings.game.easy.BOMBS)
 
     def main_loop(self):
@@ -51,6 +57,20 @@ class Main:
             self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         else:
             self.screen = pygame.display.set_mode((width, height))
+
+    def load_save(self):
+        if not os.path.exists(settings.path.SAVE_FOLDER):
+            os.makedirs(settings.path.SAVE_FOLDER)
+
+        try:
+            with open(settings.path.SAVE, 'r', encoding='utf-8') as file:
+                self.save = json.load(file)
+                file.close()
+        except (IOError, json.decoder.JSONDecodeError):
+            with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
+                # create base save dictionary
+                self.save['score'] = {0: 'None', 1: 'None', 2: 'None'}
+                file.close()
 
     class GameState:
         def __init__(self, start_game_state: str):

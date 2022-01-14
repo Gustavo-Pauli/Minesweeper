@@ -45,9 +45,6 @@ class MainMenu:
         self.menu = menu_instance
         self.selected_difficulty = 0  # 0 = easy, 1 = medium, 2 = hard, 3 = custom
 
-        # TODO get save information
-        self.best_time = {0: '00:37', 1: '01:52', 2: '05:11'}
-
         # WARNING TODO buttons are initializing at center, if change update_pos to event based, need to change here too
         self.play_button = gui_tools.Button(self.main.screen, self.menu.images.play)
         self.left_arrow_button = gui_tools.Button(self.main.screen, self.menu.images.left_arrow)
@@ -65,13 +62,13 @@ class MainMenu:
         # detect buttons collision
         if self.play_button.check_collision():
             if self.selected_difficulty == 0:
-                self.main.game = game.Game(self.main, settings.game.easy.ROWS, settings.game.easy.COLUMNS, settings.game.easy.BOMBS)
+                self.main.game = game.Game(self.main, 0)
             elif self.selected_difficulty == 1:
-                self.main.game = game.Game(self.main, settings.game.medium.ROWS, settings.game.medium.COLUMNS, settings.game.medium.BOMBS)
+                self.main.game = game.Game(self.main, 1)
             elif self.selected_difficulty == 2:
-                self.main.game = game.Game(self.main, settings.game.hard.ROWS, settings.game.hard.COLUMNS, settings.game.hard.BOMBS)
+                self.main.game = game.Game(self.main, 2)
             elif self.selected_difficulty == 3:
-                self.main.game = game.Game(self.main, 16, 32, 7)
+                self.main.game = game.Game(self.main, 3, [16, 32, 10])
             self.main.game_state.list['Menu'] = False
             self.main.game_state.list['Game'] = True
 
@@ -99,15 +96,18 @@ class MainMenu:
         if self.selected_difficulty == 0:
             gui_tools.text_renderer(self.main.screen, 'EASY', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '9x9', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
-            gui_tools.text_renderer(self.main.screen, 'BEST %s' % self.best_time[0], 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
+            if self.main.save['score']['0'] != 'None':
+                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divmod(self.main.save['score']['0'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
         elif self.selected_difficulty == 1:
             gui_tools.text_renderer(self.main.screen, 'MEDIUM', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '12x12', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
-            gui_tools.text_renderer(self.main.screen, 'BEST %s' % self.best_time[1], 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
+            if self.main.save['score']['1'] != 'None':
+                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divdod(self.main.save['score']['1'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
         elif self.selected_difficulty == 2:
             gui_tools.text_renderer(self.main.screen, 'HARD', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '16x16', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))
-            gui_tools.text_renderer(self.main.screen, 'BEST %s' % self.best_time[2], 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
+            if self.main.save['score']['2'] != 'None':
+                gui_tools.text_renderer(self.main.screen, 'BEST %02d:%02d' % divdod(self.main.save['score']['2'], 60), 15, (self.main.menu.screen_center[0], self.main.screen.get_height() - 76))
         elif self.selected_difficulty == 3:
             gui_tools.text_renderer(self.main.screen, 'CUSTOM', 42, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] - 18), font_path=settings.path.FONT_SEMIBOLD_CONDENSED)
             gui_tools.text_renderer(self.main.screen, '00x00', 26, (self.main.menu.screen_center[0], self.main.menu.screen_center[1] + 18))

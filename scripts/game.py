@@ -1,10 +1,13 @@
 import pygame
 import random
 import time
+import os.path
+import json
+from math import floor
 # from collections import namedtuple
 # from main import *
 # import main as main
-import main
+# import main
 import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
@@ -13,14 +16,33 @@ import scripts.menu as menu
 
 
 # gui, chronometer, finished etc
+
+
 class Game:
-    def __init__(self, main, rows, columns, bombs):
+    def __init__(self, main, difficulty, custom_size=None):
+        """
+
+        :param main: Main class object instance
+        :param difficulty: 0: easy, 1: medium, 2: hard, 3: custom
+        :param custom_size: [int rows, int columns, int bombs]
+        """
         self.main = main
+        self.difficulty = difficulty
+        self.custom_size = custom_size
         self.images = scripts.images.GameImages('blue')  # initialize images TODO implement this 'blue'
-        self.grid = Grid(self.main, rows, columns, bombs)
+
+        # determine how to start grid
+        if difficulty != 3:
+            self.grid = Grid(self.main, self, settings.game.DIFF_DICT[difficulty]['rows'],
+                             settings.game.DIFF_DICT[difficulty]['columns'],
+                             settings.game.DIFF_DICT[difficulty]['bombs'])
+        else:
+            try:
+                self.grid = Grid(self.main, self, custom_size[0], custom_size[1], custom_size[2])
+            except:
+                raise 'not a valid custom size'
 
         self.update_window_size()  # change window size relative to current grid size
-
         self.ui = UI(self)
 
         self.clicked = True  # variable used to don't allow multiple clicks if holding mouse button
@@ -123,25 +145,42 @@ class Game:
 
         self.grid.list[i][j].flag()
 
-    # ====== WIN / LOST SCREEN
+    # ====== SAVE / LOAD
 
-    '''
-    def render_won_screen(self):
-        # DEBUG
-        gui_tools.text_renderer(self.main.screen, 'You Won!', 64, (
-            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
+    def save_game(self):
+        # save if won and is the best time
+        # TODO change this check to implementations locations
 
-    def render_lost_screen(self):
-        # DEBUG
-        gui_tools.text_renderer(self.main.screen, 'You Lost!', 64, (
-            pygame.display.get_window_size()[0] // 2, pygame.display.get_window_size()[1] // 2))
-    '''
+        # score
+        if self.grid.won and self.main.game.difficulty != 3 and\
+                (self.main.save['score'][self.main.game.difficulty] == 'None' or
+                 self.ui.timer.elapsed_time < self.main.save['score'][self.main.game.difficulty]):
+            self.main.save['score'][self.main.game.difficulty] = floor(self.ui.timer.elapsed_time)
+
+        with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
+            json.dump(self.main.save, file, ensure_ascii=False, indent=4)
+            file.close()
+
+    '''def load(self):
+        if not os.path.exists(settings.path.SAVE_FOLDER):
+            os.makedirs(settings.path.SAVE_FOLDER)
+
+        try:
+            with open(settings.path.SAVE, 'r', encoding='utf-8') as file:
+                self.main.save = json.load(file)
+                file.close()
+        except (IOError, json.decoder.JSONDecodeError):
+            with open(settings.path.SAVE, 'w', encoding='utf-8') as file:
+                # create base save dictionary
+                self.main.save['score'] = {0: 'None', 1: 'None', 2: 'None'}
+                file.close()'''
 
 
 # generate grid of cells until valid, verify if won
 class Grid:
-    def __init__(self, main, rows, columns, bombs):
+    def __init__(self, main, game, rows, columns, bombs):
         self.main = main
+        self.game = game
         self.rows = rows
         self.columns = columns
 
@@ -194,6 +233,8 @@ class Grid:
         self.won = True
         self.block_input = True
         self.main.game.ui.timer.end_timer()
+        # print(self.main.game)
+        self.main.game.save_game()
 
     # ====== START FUNCTIONS
 
@@ -351,7 +392,7 @@ class UI:
             self.main.game_state.list['Game'] = False
 
         if self.restart_button.check_collision() and not self.game.clicked:
-            self.main.game = Game(self.main, self.game.grid.rows, self.game.grid.columns, self.game.grid.bombs_num)
+            self.main.game = Game(self.main, self.game.difficulty, self.game.custom_size)
 
     def render(self):
         self.menu_button.render()
@@ -390,14 +431,12 @@ class UI:
                 # update elapsed time
                 self.elapsed_time = time.monotonic() - self.start_time
 
-            if self.started and not self.stopped and self.elapsed_time > 3599:
-                self.elapsed_time = 3599
+            # time cap
+            # if self.started and not self.stopped and self.elapsed_time > 3599:
+            #     self.elapsed_time = 3599
 
         def render(self):
-            if self.started:
-                gui_tools.text_renderer(self.main.screen, time.ctime(self.elapsed_time)[14:19], 21, self.pos, 'midtop', font_path=settings.path.FONT_REGULAR)
-            else:
-                gui_tools.text_renderer(self.main.screen, '00:00', 21, self.pos, 'midtop', font_path=settings.path.FONT_REGULAR)
+            gui_tools.text_renderer(self.main.screen, '%02d:%02d' % divmod(self.elapsed_time, 60), 21, self.pos, 'midtop', font_path=settings.path.FONT_REGULAR)
 
         def start_timer(self):
             self.started = True
