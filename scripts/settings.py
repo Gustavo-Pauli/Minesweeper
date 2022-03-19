@@ -10,8 +10,8 @@ import pygame
 
 # screen
 # medium 444x504
-START_WIDTH = 316
-START_HEIGHT = 376
+START_WIDTH = 348
+START_HEIGHT = 386
 TITLE = 'Minesweeper'
 MAX_FPS = 300
 
@@ -94,10 +94,17 @@ class path:
     FONT_REGULAR = 'assets/fonts/Bahnschrift-Regular.ttf'
 
     # ====== IMAGES
+    # MAIN
+    ICON = 'assets/art/Icon.png'
+
     # MENU
     PLAY_BUTTON = 'assets/art/menu/PlayButton.png'
     LEFT_ARROW = 'assets/art/menu/LeftArrow.png'
     RIGHT_ARROW = 'assets/art/menu/RightArrow.png'
+    INPUT_BOX_2_DIGITS = 'assets/art/menu/InputBox2Digits.png'
+    INPUT_BOX_2_DIGITS_SELECTED = 'assets/art/menu/InputBox2DigitsSelected.png'
+    INPUT_BOX_4_DIGITS = 'assets/art/menu/InputBox4Digits.png'
+    INPUT_BOX_4_DIGITS_SELECTED = 'assets/art/menu/InputBox4DigitsSelected.png'
 
     # GAME GRID
     CELL_COVER = 'assets/art/game/Cover.png'

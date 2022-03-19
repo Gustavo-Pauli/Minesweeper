@@ -2,6 +2,11 @@ import scripts.settings as settings
 import scripts.gui_tools as gui_tools
 
 
+class MainImages:
+    def __init__(self):
+        self.icon = gui_tools.import_image(settings.path.ICON, alpha=True)
+
+
 class GameImages:
     def __init__(self, color='blue'):
         # TODO determine which COLOR to load
@@ -45,6 +50,11 @@ class MenuImages:
         self.play = gui_tools.import_image(settings.path.PLAY_BUTTON, alpha=True)
         self.left_arrow = gui_tools.import_image(settings.path.LEFT_ARROW, alpha=True)
         self.right_arrow = gui_tools.import_image(settings.path.RIGHT_ARROW, alpha=True)
+        self.input_box_2_digits = gui_tools.import_image(settings.path.INPUT_BOX_2_DIGITS, alpha=True)
+        self.input_box_2_digits_selected = gui_tools.import_image(settings.path.INPUT_BOX_2_DIGITS_SELECTED, alpha=True)
+        self.input_box_4_digits = gui_tools.import_image(settings.path.INPUT_BOX_4_DIGITS, alpha=True)
+        self.input_box_4_digits_selected = gui_tools.import_image(settings.path.INPUT_BOX_4_DIGITS_SELECTED, alpha=True)
+
 
 
 

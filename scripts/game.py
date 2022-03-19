@@ -3,19 +3,12 @@ import random
 import time
 import os.path
 import json
+import sys
 from math import floor
-# from collections import namedtuple
-# from main import *
-# import main as main
-# import main
 import scripts.images
 import scripts.settings as settings
 import scripts.gui_tools as gui_tools
 import scripts.menu as menu
-# from scripts.vector2 import *
-
-
-# gui, chronometer, finished etc
 
 
 class Game:
@@ -29,7 +22,7 @@ class Game:
         self.main = main
         self.difficulty = difficulty
         self.custom_size = custom_size
-        self.images = scripts.images.GameImages('blue')  # initialize images TODO implement this 'blue'
+        self.images = scripts.images.GameImages('blue')  # initialize images
 
         # determine how to start grid
         if difficulty != 3:
@@ -37,10 +30,7 @@ class Game:
                              settings.game.DIFF_DICT[difficulty]['columns'],
                              settings.game.DIFF_DICT[difficulty]['bombs'])
         else:
-            try:
-                self.grid = Grid(self.main, self, custom_size[0], custom_size[1], custom_size[2])
-            except:
-                raise 'not a valid custom size'
+            self.grid = Grid(self.main, self, custom_size[0], custom_size[1], custom_size[2])
 
         self.update_window_size()  # change window size relative to current grid size
         self.ui = UI(self)
@@ -48,6 +38,12 @@ class Game:
         self.clicked = True  # variable used to don't allow multiple clicks if holding mouse button
 
     def update(self):
+        # handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
         self.check_input()
         self.ui.update()
 
@@ -118,7 +114,7 @@ class Game:
         if self.grid.block_input:
             return None
 
-        clicked_cell = self.grid.list[clicked_cell_pos[0]][clicked_cell_pos[1]]
+        clicked_cell = self.grid.cell_list[clicked_cell_pos[0]][clicked_cell_pos[1]]
 
         # don't do nothing if the clicked cell is flagged
         if clicked_cell.flagged:
@@ -143,7 +139,7 @@ class Game:
         i = clicked_cell[0]
         j = clicked_cell[1]
 
-        self.grid.list[i][j].flag()
+        self.grid.cell_list[i][j].flag()
 
     # ====== SAVE / LOAD
 
@@ -168,33 +164,40 @@ class Game:
 # generate grid of cells until valid, verify if won
 class Grid:
     def __init__(self, main, game, rows, columns, bombs):
+        # raise error if passed wrong parameters
+        if rows < 9:
+            raise ValueError('rows cant be less than 9')
+        if columns < 9:
+            raise ValueError('columns cant be less than 9')
+        if bombs < 1:
+            raise ValueError('bombs cant be less than 1')
+        if bombs > (rows * columns) - 9:
+            raise ValueError('too many bombs')
+
         self.main = main
         self.game = game
         self.rows = rows
         self.columns = columns
+        self.bombs = bombs
 
-        self.bombs_num = bombs
         self.size = int(rows * columns)
         self.revealed_cells = 0  # if this is equal to (self.size - self.bombs_num) the game end (winned)
-        self.timer = 0  # TODO implement this
         self.started = False
         self.won = False
         self.lost = False
         self.block_input = False  # if user can interact with the grid
 
-        # TODO check if has minimun rows and columns
-
         # create a list with empty cells to be filled later
-        self.list = self.create_cell_list(self.rows, self.columns)
+        self.cell_list = self.create_cell_list(self.rows, self.columns)
 
         # DEBUG print number of rows and columns
-        print('grid initialized with: ' + str(self.rows) + ' rows and ' + str(self.columns) + ' columns')
+        print('grid initialized with: ' + str(self.rows) + ' rows, ' + str(self.columns) + ' columns and ' + str(self.bombs) + ' bombs')
 
     # render all cells on screen
     def render(self):
         for i in range(self.rows):
             for j in range(self.columns):
-                self.list[i][j].render()
+                self.cell_list[i][j].render()
                 # print('rendering (' + str(x) + ' ' + str(y) + ')')  # debug
 
     # start the game (generate bombs and numbers, start timer, etc)
@@ -212,8 +215,8 @@ class Grid:
         # reveal all bombs
         for i in range(self.rows):
             for j in range(self.columns):
-                if self.list[i][j].type == -1:  # if is a bomb
-                    self.list[i][j].reveal()
+                if self.cell_list[i][j].type == -1:  # if is a bomb
+                    self.cell_list[i][j].reveal()
 
         # change clicked bomb to exploded image
         clicked_bomb_cell.exploded = True
@@ -227,23 +230,23 @@ class Grid:
 
     # ====== START FUNCTIONS
 
+    # create a 'empty' list of cells
+    def create_cell_list(self, rows, columns):
+        return [[Cell(self.main, 0, (x, y)) for y in range(columns)] for x in range(rows)]
+
     # generate bombs in random locations
     def generate_bombs(self, first_clicked_cell_pos):
-        # raise error if has too much bombs
-        if self.bombs_num >= self.size - 8:
-            raise ValueError('too many bombs')
-
         # get adjacents cells of clicked cell to dont spawn bomb on then
         adjacents_cells_pos = [cell.pos for cell in self.get_adjacent_cells(first_clicked_cell_pos) if
                                cell is not None]
 
         # generate all bombs
         bombs_generated = 0
-        while bombs_generated < self.bombs_num:
+        while bombs_generated < self.bombs:
             # generate a random cell location
             bomb_int_location = random.randint(0, self.size - 1)
             bomb_location = (bomb_int_location % self.rows, bomb_int_location // self.rows)
-            bomb_cell = self.list[bomb_location[0]][bomb_location[1]]
+            bomb_cell = self.cell_list[bomb_location[0]][bomb_location[1]]
 
             # if cell is not a bomb and not around first clicked cell, put a bomb. if is a bomb or first cell, generate again.
             if bomb_cell.type != -1 and bomb_cell.pos not in adjacents_cells_pos:
@@ -257,7 +260,7 @@ class Grid:
         for i in range(self.rows):
             for j in range(self.columns):
                 # skip if is a bomb
-                if self.list[i][j].type == -1:
+                if self.cell_list[i][j].type == -1:
                     continue
 
                 # check how many bombs are nearby
@@ -277,17 +280,13 @@ class Grid:
 
                 # change cell type if has bomb nearby
                 if nearby_bombs > 0:
-                    self.list[i][j].type = nearby_bombs
-
-    # create a 'empty' list of cells
-    def create_cell_list(self, rows, columns):
-        return [[Cell(self.main, 0, (x, y)) for y in range(columns)] for x in range(rows)]
+                    self.cell_list[i][j].type = nearby_bombs
 
     # ====== ======
 
     # check if all non-bomb cells are open
     def check_if_won(self):
-        if not self.lost and self.size - self.bombs_num == self.revealed_cells:
+        if not self.lost and self.size - self.bombs == self.revealed_cells:
             self.won_game()
 
     def get_adjacent_cells(self, mid_cell_cord: (int, int)):
@@ -298,7 +297,7 @@ class Grid:
         for x in (-1, 0, 1):
             for y in (-1, 0, 1):
                 if 0 <= i - x < self.rows and 0 <= j - y < self.columns:
-                    cells_list[(x + 1) * 3 + (y + 1)] = self.list[i - x][j - y]
+                    cells_list[(x + 1) * 3 + (y + 1)] = self.cell_list[i - x][j - y]
 
         return cells_list
 
@@ -345,8 +344,8 @@ class Cell:
                     for y in (-1, 0, 1):
                         if 0 <= self.pos[0] - x < self.main.game.grid.rows\
                                 and 0 <= self.pos[1] - y < self.main.game.grid.columns\
-                                and not self.main.game.grid.list[self.pos[0] - x][self.pos[1] - y].type == -1:
-                            self.main.game.grid.list[self.pos[0] - x][self.pos[1] - y].reveal()
+                                and not self.main.game.grid.cell_list[self.pos[0] - x][self.pos[1] - y].type == -1:
+                            self.main.game.grid.cell_list[self.pos[0] - x][self.pos[1] - y].reveal()
 
             # check if won
             self.main.game.grid.check_if_won()
@@ -374,15 +373,6 @@ class UI:
     def update(self):
         self.timer.update()
 
-    def check_input(self):
-        if self.menu_button.check_collision() and not self.game.clicked:
-            self.main.menu = menu.Menu(self.main)
-            self.main.game_state.list['Menu'] = True
-            self.main.game_state.list['Game'] = False
-
-        if self.restart_button.check_collision() and not self.game.clicked:
-            self.main.game = Game(self.main, self.game.difficulty, self.game.custom_size)
-
     def render(self):
         self.menu_button.render()
         self.restart_button.render()
@@ -393,6 +383,15 @@ class UI:
             self.__render_won_screen()
         if self.main.game.grid.lost:
             self.__render_lost_screen()
+
+    def check_input(self):
+        if self.menu_button.check_collision() and not self.game.clicked:
+            self.main.menu = menu.Menu(self.main)
+            self.main.game_state.list['Menu'] = True
+            self.main.game_state.list['Game'] = False
+
+        if self.restart_button.check_collision() and not self.game.clicked:
+            self.main.game = Game(self.main, self.game.difficulty, self.game.custom_size)
 
     def __render_lost_screen(self):
         # DEBUG

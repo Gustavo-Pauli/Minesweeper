@@ -4,15 +4,18 @@ import pygame
 import sys
 import scripts.menu as menu
 import scripts.settings as settings
+import scripts.images as images
 
 
 class Main:
     def __init__(self):
         self.screen = None  # set menu window size
-        self.update_window_size(settings.START_WIDTH, settings.START_HEIGHT)
         self.game_state = self.GameState('Menu')
         self.clock = pygame.time.Clock()
+        self.update_window_size(settings.START_WIDTH, settings.START_HEIGHT)
+        self.main_images = images.MainImages()
 
+        pygame.display.set_icon(self.main_images.icon)
         pygame.display.set_caption(settings.TITLE)  # set window title
 
         # global variables
@@ -25,15 +28,7 @@ class Main:
         self.save = {}  # all attributes in save json file
         self.load_save()
 
-        # self.game = game.Game(self, settings.game.easy.ROWS, settings.game.easy.COLUMNS, settings.game.easy.BOMBS)
-
     def main_loop(self):
-        # handle global events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
         # update delta time
         self.update_dt()
 
@@ -53,6 +48,7 @@ class Main:
         self.dt = self.clock.tick(settings.MAX_FPS) / 1000
 
     def update_window_size(self, width, height, resizable=False):
+        # print('width: ' + str(width) + ', height: ' + str(height))
         if resizable:
             self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         else:
