@@ -2,7 +2,6 @@ import sys
 
 import pygame
 import scripts.settings as settings
-from scripts.vector2 import *
 
 
 def text_renderer(screen_surface: pygame.surface, text: str, size: int, pos=(0, 0), align='center',
