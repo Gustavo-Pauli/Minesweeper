@@ -2,13 +2,25 @@ import json
 import os.path
 import pygame
 import sys
+import threading
 import scripts.menu as menu
 import scripts.settings as settings
 import scripts.images as images
 
 
 class Main:
+    __instance = None
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super(Main, cls).__new__(cls)
+            cls.__instance.__initialized = False
+        return cls.__instance
+
     def __init__(self):
+        if self.__initialized: return
+        self.__initialized = True
+
         self.screen = None  # set menu window size
         self.game_state = self.GameState('Menu')
         self.clock = pygame.time.Clock()
@@ -22,7 +34,7 @@ class Main:
         self.dt = 0
 
         # game states
-        self.menu = menu.Menu(self)
+        self.menu = menu.Menu()
         self.game = None
 
         self.save = {}  # all attributes in save json file
@@ -81,8 +93,9 @@ class Main:
             self.list[start_game_state] = True
 
 
-if __name__ == '__main__':
-    pygame.init()
-    main = Main()
-    while True:
-        main.main_loop()
+sys.setrecursionlimit(10000)
+pygame.init()
+main = Main()
+# print('Main: ' + str(main))
+while True:
+    main.main_loop()

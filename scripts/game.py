@@ -12,25 +12,25 @@ import scripts.menu as menu
 
 
 class Game:
-    def __init__(self, main, difficulty, custom_size=None):
+    def __init__(self, difficulty, custom_size=None):
         """
 
         :param main: Main class object instance
         :param difficulty: 0: easy, 1: medium, 2: hard, 3: custom
         :param custom_size: [int rows, int columns, int bombs]
         """
-        self.main = main
+        import main
+        self.main = main.Main()
+        # print('Game: ' + str(self.main))
         self.difficulty = difficulty
         self.custom_size = custom_size
         self.images = scripts.images.GameImages('blue')  # initialize images
 
         # determine how to start grid
         if difficulty != 3:
-            self.grid = Grid(self.main, self, settings.game.DIFF_DICT[difficulty]['rows'],
-                             settings.game.DIFF_DICT[difficulty]['columns'],
-                             settings.game.DIFF_DICT[difficulty]['bombs'])
+            self.grid = Grid(self, settings.game.DIFF_DICT[difficulty]['rows'], settings.game.DIFF_DICT[difficulty]['columns'], settings.game.DIFF_DICT[difficulty]['bombs'])
         else:
-            self.grid = Grid(self.main, self, custom_size[0], custom_size[1], custom_size[2])
+            self.grid = Grid(self, custom_size[0], custom_size[1], custom_size[2])
 
         self.update_window_size()  # change window size relative to current grid size
         self.ui = UI(self)
@@ -163,7 +163,7 @@ class Game:
 
 # generate grid of cells until valid, verify if won
 class Grid:
-    def __init__(self, main, game, rows, columns, bombs):
+    def __init__(self, game, rows, columns, bombs):
         # raise error if passed wrong parameters
         if rows < 9:
             raise ValueError('rows cant be less than 9')
@@ -174,7 +174,8 @@ class Grid:
         if bombs > (rows * columns) - 9:
             raise ValueError('too many bombs')
 
-        self.main = main
+        import main
+        self.main = main.Main()
         self.game = game
         self.rows = rows
         self.columns = columns
@@ -232,7 +233,7 @@ class Grid:
 
     # create a 'empty' list of cells
     def create_cell_list(self, rows, columns):
-        return [[Cell(self.main, 0, (x, y)) for y in range(columns)] for x in range(rows)]
+        return [[Cell(0, (x, y)) for y in range(columns)] for x in range(rows)]
 
     # generate bombs in random locations
     def generate_bombs(self, first_clicked_cell_pos):
@@ -303,12 +304,13 @@ class Grid:
 
 
 class Cell:
-    def __init__(self, main, cell_type, pos):
+    def __init__(self, cell_type, pos):
         # raise exception if cell_type is not valid
         if cell_type not in [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8]:
             raise ValueError(cell_type + ' is not a valid cell type')
 
-        self.main = main
+        import main
+        self.main = main.Main()
         self.type = cell_type
         self.pos = pos  # coordinates in the grid
         # print('creating cell (' + str(pos[0]) + ' ' + str(pos[1]) + ')')  # debug
@@ -340,6 +342,8 @@ class Cell:
 
             # search around for other zeroes
             if self.type == 0:
+                queue = []
+
                 for x in (-1, 0, 1):
                     for y in (-1, 0, 1):
                         if 0 <= self.pos[0] - x < self.main.game.grid.rows\
@@ -360,7 +364,8 @@ class Cell:
 
 class UI:
     def __init__(self, game):
-        self.main = game.main
+        import main
+        self.main = main.Main()
         self.game = game
 
         self.margin = [settings.HUD_MARGIN[0], settings.RIGHT_MARGIN, settings.HUD_MARGIN[2], settings.LEFT_MARGIN]
@@ -386,12 +391,12 @@ class UI:
 
     def check_input(self):
         if self.menu_button.check_collision() and not self.game.clicked:
-            self.main.menu = menu.Menu(self.main)
+            self.main.menu = menu.Menu()
             self.main.game_state.list['Menu'] = True
             self.main.game_state.list['Game'] = False
 
         if self.restart_button.check_collision() and not self.game.clicked:
-            self.main.game = Game(self.main, self.game.difficulty, self.game.custom_size)
+            self.main.game = Game(self.game.difficulty, self.game.custom_size)
 
     def __render_lost_screen(self):
         # DEBUG
@@ -406,7 +411,8 @@ class UI:
     # TODO passing game class instance leave room for errors, cause if instanced in wrong order the program may crash
     class Timer:
         def __init__(self, ui):
-            self.main = ui.game.main
+            import main
+            self.main = main.Main()
             self.ui = ui
             self.pos = (self.main.screen.get_width() // 2, self.ui.margin[0] + 4)
             self.started = False

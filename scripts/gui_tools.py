@@ -91,8 +91,8 @@ def screen_to_grid_pos(pos, rows, columns):
     return grid_mouse_pos[1] // settings.CELL_SIZE, grid_mouse_pos[0] // settings.CELL_SIZE
 
 
-# creates clickable buttons
 class Button:
+    """Create a clickable button"""
     def __init__(self, screen: pygame.surface, image: pygame.surface, pos=(0, 0), align='center', scale=1.0):
         self.screen = screen
         self.image = pygame.transform.smoothscale(image,
@@ -157,8 +157,9 @@ class Button:
 
 
 class InputBox:
-    def __init__(self, screen: pygame.surface, image: pygame.surface, selected_image: pygame.surface, pos=(0, 0), max_characters=19, max_min=(sys.maxsize, 0), scale=1.0, left_margin=12,
-                 font_path=settings.path.FONT_REGULAR, font_size=28):
+    """Input field for number values"""
+    def __init__(self, screen: pygame.surface, image: pygame.surface, selected_image: pygame.surface, pos=(0, 0), max_characters=19,
+                 max_min=(sys.maxsize, 0), initial_value=10, scale=1.0, left_margin=12, font_path=settings.path.FONT_REGULAR, font_size=28):
         self.screen = screen
         self.max_characters = max_characters
         self.max_number = max_min[0]
@@ -174,7 +175,7 @@ class InputBox:
         self.rect = self.image.get_rect()
         self.rect.center = pos
         self.font = pygame.font.Font(font_path, font_size)
-        self.text = ''
+        self.text = str(initial_value)
         self.selected = False
 
         self.is_holding_click = False
@@ -184,10 +185,9 @@ class InputBox:
                                      pygame.K_KP9]
 
     def check_collision(self):
-        # get if mouse is colliding and mouse 1 is pressed to set self.selected
+        """Get if clicked to change self.selected"""
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed(3)[0] and not self.is_holding_click:
-            # action
             self.selected = not self.selected
             self.is_holding_click = True
         if not self.rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed(3)[0] and not self.is_holding_click:
@@ -215,6 +215,16 @@ class InputBox:
                     self.text = str(self.max_number)
             except ValueError:
                 self.text = str(self.min_number)
+
+    def force_update_input(self):
+        """Force update input value to clamp to min and max value anytime"""
+        try:
+            if int(self.text) < self.min_number:
+                self.text = str(self.min_number)
+            elif int(self.text) > self.max_number:
+                self.text = str(self.max_number)
+        except ValueError:
+            self.text = str(self.min_number)
 
     def input_event(self, event):
         """
