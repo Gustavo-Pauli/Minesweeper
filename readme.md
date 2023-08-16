@@ -5,7 +5,7 @@
 
 ## How to run the game:
 
-### Option 1 (preferred):
+### Option 1:
 1) Install Python 3.9.9 or higher.
 2) Install the packages in <b>requirements.txt</b>, using the following command in the terminal in the game folder: <b>pip install -r requirements.txt</b>
 3) Run main.py file using <b>python main.py</b> in terminal.
